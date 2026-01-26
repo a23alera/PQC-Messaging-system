@@ -20,8 +20,7 @@ module.exports = (io, socket) => {
   });
   socket.on('send-message', async (data) => {
     try {
-      const { sender, receiver, message } = data;
-
+      const { sender, receiver, message } = data;      
       await chatModel.store({
         id: uuidv4(),
         sender,
@@ -37,6 +36,7 @@ module.exports = (io, socket) => {
       console.log(error.message);
     }
   });
+
   socket.on('edit-message', async (data) => {
     try {
       const { sender, receiver, message, id } = data;
