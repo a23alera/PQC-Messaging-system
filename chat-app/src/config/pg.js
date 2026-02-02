@@ -24,11 +24,13 @@ if (NODE_ENV === 'production') {
 
 const db = new Pool(config);
 
+/*
 db.connect((err) => {
   if (err) {
     console.log('Failed to connect database...', err.message);
     process.exit(1);
   }
 });
+*/
 
 module.exports = db;

@@ -1,82 +1,57 @@
-const { v4: uuidv4 } = require('uuid');
-const chatModel = require('../models/chat.model');
+const crypto = require("node:crypto");
+
+const metrics = {
+  signTimes: [],
+  verifyTimes: [],
+  signatureSizes: [],
+};
+
+const {
+  generateEd25519Keypair,
+  signEd25519,
+  verifyEd25519,
+} = require("../security/signature");
+
+const keyStore = new Map();
+
+function getOrCreateKeysForUser(userId) {
+  if (!keyStore.has(userId)) {
+    keyStore.set(userId, generateEd25519Keypair());
+  }
+  return keyStore.get(userId);
+}
 
 module.exports = (io, socket) => {
-  socket.on('join-room', (id) => {
-    try {
-      socket.join(id);
-    } catch (error) {
-      console.log(error.message);
-    }
-  });
-  socket.on('chat-history', async (data) => {
-    try {
-      const { sender, receiver } = data;
-      const listChat = await chatModel.list(sender, receiver);
-      io.to(sender).emit('send-message-response', listChat.rows);
-    } catch (error) {
-      console.log(error.message);
-    }
-  });
-  socket.on('send-message', async (data) => {
-    try {
-      const { sender, receiver, message } = data;      
-      await chatModel.store({
-        id: uuidv4(),
-        sender,
-        receiver,
-        message,
-        type: 'text',
-      });
+  socket.on("send-message", (data) => {
+    const { sender, receiver, message } = data;
+    const payload = JSON.stringify({ sender, receiver, message });
 
-      const listChat = await chatModel.list(sender, receiver);
+    const { privateKey, publicKey } = getOrCreateKeysForUser(sender);
 
-      io.to(receiver).emit('send-message-response', listChat.rows);
-    } catch (error) {
-      console.log(error.message);
-    }
-  });
+    const signStart = process.hrtime.bigint();
+    const signature = signEd25519(privateKey, payload);
+    const signEnd = process.hrtime.bigint();
 
-  socket.on('edit-message', async (data) => {
-    try {
-      const { sender, receiver, message, id } = data;
+    const signTimeNs = Number(signEnd - signStart);
+    metrics.signTimes.push(signTimeNs);
+    metrics.signatureSizes.push(
+      Buffer.from(signature, "base64").length
+    );
 
-      await chatModel.update(message, id);
+    const verifyStart = process.hrtime.bigint();
+    const isValid = verifyEd25519(publicKey, payload, signature);
+    const verifyEnd = process.hrtime.bigint();
 
-      const listChat = await chatModel.list(sender, receiver);
+    const verifyTimeNs = Number(verifyEnd - verifyStart);
+    metrics.verifyTimes.push(verifyTimeNs);
 
-      io.to(sender).emit('send-message-response', listChat.rows);
-      io.to(receiver).emit('send-message-response', listChat.rows);
-    } catch (error) {
-      console.log(error.message);
-    }
-  });
-  socket.on('destroy-message', async (data) => {
-    try {
-      const { sender, receiver, id } = data;
-
-      await chatModel.destroy(id);
-
-      const listChat = await chatModel.list(sender, receiver);
-
-      io.to(sender).emit('send-message-response', listChat.rows);
-      io.to(receiver).emit('send-message-response', listChat.rows);
-    } catch (error) {
-      console.log(error.message);
-    }
-  });
-  socket.on('delete-message', async (data) => {
-    try {
-      const { sender, receiver, id } = data;
-
-      await chatModel.delete(id);
-
-      const listChat = await chatModel.list(sender, receiver);
-
-      io.to(sender).emit('send-message-response', listChat.rows);
-      io.to(receiver).emit('send-message-response', listChat.rows);
-    } catch (error) {
-      console.log(error.message);
-    }
+    socket.emit("benchmark-result", {
+      valid: isValid,
+      signTimeNs,
+      verifyTimeNs,
+      signatureSize: Buffer.from(signature, "base64").length,
+    });
   });
 };
+
+module.exports.metrics = metrics;
