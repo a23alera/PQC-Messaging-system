@@ -29,6 +29,7 @@ const ed25519 = require("./ed25519");
 // Importerar SLH-DSA-implementationen
 const slhDsa = require("./slh-dsa");
 
+const mlDsa = require("./ml-dsa")
 
 function getSigner() {
 
@@ -50,6 +51,9 @@ function getSigner() {
     return slhDsa;
   }
 
+  if(alg == "ml-dsa" || alg == "ml-dsa65"){
+    return mlDsa;
+  }
 
   /*
     Om en okänd algoritm anges kastas ett tydligt fel.
