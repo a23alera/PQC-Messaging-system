@@ -1,5 +1,7 @@
 // Importerar signer-factory som väljer algoritm (Ed25519 / SLH-DSA)
 const { getSigner } = require("../security/getSigner");
+const fs = require("fs");
+const path = require("path");
 
 /*
   Metrics-objekt används för att lagra
@@ -76,6 +78,34 @@ function signatureSizeInBytes(signature) {
   return Buffer.from(signature).length;
 }
 
+function ensureDir(dirPath) {
+  fs.mkdirSync(dirPath, { recursive: true });
+}
+
+function safeFilename(s) {
+  return String(s).replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
+function saveRunToJson({ algorithm, iterations, messageSizeBytes, samples }) {
+  const resultsDir = path.join(__dirname, "..", "results");
+  ensureDir(resultsDir);
+
+  const filePath = path.join(resultsDir, `${safeFilename(algorithm)}_latest.json`);
+
+  const payload = {
+    meta: {
+      algorithm,
+      iterations,
+      messageSizeBytes,
+      startedAt: new Date().toISOString(),
+    },
+    samples,
+  };
+
+  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
+  return filePath;
+}
+
 module.exports = (io, socket) => {
   socket.on("send-message", async (data) => {
     const { sender, receiver, message } = data;
@@ -85,49 +115,76 @@ module.exports = (io, socket) => {
     const rawKeys = await maybeAwait(getOrCreateKeysForUser(sender));
     const { publicKey, secretKey } = normalizeKeys(rawKeys);
 
-    const signStart = process.hrtime.bigint();
+    // NOLLSTÄLL PER KÖRNING (så /metrics visar senaste run)
+    metrics.signTimes = [];
+    metrics.verifyTimes = [];
+    metrics.signatureSizes = [];
+    metrics.algorithm = signer.name;
 
-    /*
-      Vi försöker först med bytes (funkar för SLH-DSA).
-      Om din Ed25519 vill ha string kan den ändå fungera,
-      men om den inte gör det fångar vi och provar med payload-string.
-    */
-    let signature;
-    try {
-      const messageBytes = Buffer.from(payload, "utf8");
-      signature = await maybeAwait(signer.sign(messageBytes, secretKey));
-    } catch (err) {
-      signature = await maybeAwait(signer.sign(payload, secretKey));
+    const iterations = data.benchmark?.iterations ?? 10;
+    const samples = [];
+
+    for (let i = 1; i <= iterations; i++) {
+      const signStart = process.hrtime.bigint();
+
+      let signature;
+      try {
+        const messageBytes = Buffer.from(payload, "utf8");
+        signature = await maybeAwait(signer.sign(messageBytes, secretKey));
+      } catch (err) {
+        signature = await maybeAwait(signer.sign(payload, secretKey));
+      }
+
+      const signEnd = process.hrtime.bigint();
+      const signTimeNs = Number(signEnd - signStart);
+
+      const sigSize = signatureSizeInBytes(signature);
+
+      const verifyStart = process.hrtime.bigint();
+
+      let isValid;
+      try {
+        const messageBytes = Buffer.from(payload, "utf8");
+        isValid = await maybeAwait(signer.verify(messageBytes, signature, publicKey));
+      } catch (err) {
+        isValid = await maybeAwait(signer.verify(publicKey, payload, signature));
+      }
+
+      const verifyEnd = process.hrtime.bigint();
+      const verifyTimeNs = Number(verifyEnd - verifyStart);
+
+      // Samla lokalt för denna körning
+      samples.push({
+        i,
+        signTimeNs,
+        verifyTimeNs,
+        packageSizeBytes: sigSize,
+        valid: isValid,
+      });
+
+      // (Valfritt) Om du fortfarande vill fylla globala metrics:
+      metrics.signTimes.push(signTimeNs);
+      metrics.verifyTimes.push(verifyTimeNs);
+      metrics.signatureSizes.push(sigSize);
     }
 
-    const signEnd = process.hrtime.bigint();
-    const signTimeNs = Number(signEnd - signStart);
-    metrics.signTimes.push(signTimeNs);
+    const messageSizeBytes = Buffer.byteLength(payload, "utf8");
 
-    const sigSize = signatureSizeInBytes(signature);
-    metrics.signatureSizes.push(sigSize);
-
-    const verifyStart = process.hrtime.bigint();
-
-    let isValid;
-    try {
-      const messageBytes = Buffer.from(payload, "utf8");
-      isValid = await maybeAwait(signer.verify(messageBytes, signature, publicKey));
-    } catch (err) {
-      isValid = await maybeAwait(signer.verify(publicKey, payload, signature));
-    }
-
-    const verifyEnd = process.hrtime.bigint();
-    const verifyTimeNs = Number(verifyEnd - verifyStart);
-    metrics.verifyTimes.push(verifyTimeNs);
+    const savedPath = saveRunToJson({
+      algorithm: signer.name,
+      iterations,
+      messageSizeBytes,
+      samples,
+    });
 
     socket.emit("benchmark-result", {
       algorithm: signer.name,
-      valid: isValid,
-      signTimeNs,
-      verifyTimeNs,
-      signatureSize: sigSize,
+      iterations,
+      savedPath,
+      samples,
+      last: samples[samples.length - 1],
     });
+
   });
 };
 
