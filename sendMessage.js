@@ -12,7 +12,8 @@ socket.on("connect", () => {
   socket.emit("send-message", {
     sender: "alice",
     receiver: "bob",
-    message: "Hej! Benchmark-test"
+    message: "Hej! Benchmark-test",
+    benchmark: { iterations: 10 }
   });
 });
 
