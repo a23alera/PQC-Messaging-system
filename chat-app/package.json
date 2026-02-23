@@ -4,10 +4,17 @@
   "description": "Create a Node.js app for building Realtime Chat RESTful APIs using Express",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "dev": "nodemon server.js",
+  "start": "node server.js",
+
+  "start:ed25519": "SIG_ALG=ed25519 node server.js",
+  "start:slh": "SIG_ALG=slh-dsa node server.js",
+
+  "dev:ed25519": "SIG_ALG=ed25519 nodemon server.js",
+  "dev:slh": "SIG_ALG=slh-dsa nodemon server.js",
+
+  "test": "echo \"Error: no test specified\" && exit 1"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/altrawan/realtime-chat-api.git"
@@ -26,6 +33,7 @@
   },
   "homepage": "https://github.com/altrawan/realtime-chat-api#readme",
   "dependencies": {
+    "@oqs/liboqs-js": "^0.15.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
     "compression": "^1.7.4",
