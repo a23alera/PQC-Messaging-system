@@ -139,6 +139,8 @@ module.exports = (io, socket) => {
       const signTimeNs = Number(signEnd - signStart);
 
       const sigSize = signatureSizeInBytes(signature);
+      const msgSize = Buffer.byteLength(payload, "utf8");
+      const packageSizeBytes = msgSize + sigSize;
 
       const verifyStart = process.hrtime.bigint();
 
@@ -158,7 +160,7 @@ module.exports = (io, socket) => {
         i,
         signTimeNs,
         verifyTimeNs,
-        packageSizeBytes: sigSize,
+        packageSizeBytes: packageSizeBytes,
         valid: isValid,
       });
 

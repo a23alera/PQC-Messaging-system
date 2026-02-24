@@ -67,13 +67,17 @@ function main() {
   console.log(meta);
 
   console.log("\n========== SIGN (ns) ==========");
-  console.log(summarize(samples, "signTimeNs"));
+  console.log(JSON.stringify(summarize(samples, "signTimeNs")));
 
   console.log("\n========== VERIFY (ns) ==========");
-  console.log(summarize(samples, "verifyTimeNs"));
+  console.log(JSON.stringify(summarize(samples, "verifyTimeNs")));
 
   console.log("\n========== PACKAGE SIZE (bytes) ==========");
-  console.log(summarize(samples, "packageSizeBytes"));
+  if (samples.length > 0) {
+    console.log(samples[0].packageSizeBytes);
+  } else {
+    console.log("No samples");
+  }
 }
 
 main();
