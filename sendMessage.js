@@ -9,19 +9,25 @@ console.log("Client script started");
 socket.on("connect", () => {
   console.log("Connected:", socket.id);
 
+  const messageSize = 100;
+
+  const messageBuffer = Buffer.alloc(messageSize,"a");
   socket.emit("send-message", {
     sender: "alice",
     receiver: "bob",
-    message: "Hej! Benchmark-test",
+    message: messageBuffer.toString("base64"),
     benchmark: { iterations: 10 }
   });
 });
 
 socket.on("benchmark-result", (data) => {
-  console.log("Resultat:", data);
-  socket.disconnect();
-  process.exit(0);
-});
+    const iterations = data?.iterations || "okänt antal";
+  
+    console.log(`Benchmark klart. ${iterations} iterationer kördes.`);
+    
+    socket.disconnect();
+    process.exit(0);
+  });
 
 socket.on("connect_error", (err) => {
   console.error("Connect error:", err.message);
