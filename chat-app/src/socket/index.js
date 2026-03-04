@@ -126,7 +126,6 @@ module.exports = (io, socket) => {
 
     for (let i = 1; i <= iterations; i++) {
       const signStart = process.hrtime.bigint();
-      const signStartMs = Number(signStart / 1_000_000n);
 
       let signature;
       try {
@@ -137,18 +136,14 @@ module.exports = (io, socket) => {
       }
 
       const signEnd = process.hrtime.bigint();
-      const signEndMs = Number(signEnd / 1_000_000n);
 
 
-      const signTimeMs = Number(signEndMs - signStartMs);
-
+      const signTimeMs = Number(signEnd - signStart) / 1_000_000;
       const sigSize = signatureSizeInBytes(signature);
       const msgSize = Buffer.byteLength(payload, "utf8");
       const packageSizeBytes = msgSize + sigSize;
 
       const verifyStart = process.hrtime.bigint();
-      //convert nanoseconds to milliseconds
-      const verifyStartMs = Number(verifyStart / 1_000_000n);
 
 
       let isValid;
@@ -160,10 +155,7 @@ module.exports = (io, socket) => {
       }
 
       const verifyEnd = process.hrtime.bigint();
-      //convert to milliseconds
-      const verifyEndMs = Number(verifyEnd / 1_000_000n);
-
-      const verifyTimeMs = Number(verifyEndMs - verifyStartMs);
+      const verifyTimeMs = Number(verifyEnd - verifyStart) / 1_000_000;
 
       // Samla lokalt för denna körning
       samples.push({
