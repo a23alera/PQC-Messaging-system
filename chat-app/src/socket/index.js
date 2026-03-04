@@ -131,12 +131,14 @@ module.exports = (io, socket) => {
       }
 
       const signEnd = process.hrtime.bigint();
-      const signTimeNs = Number(signEnd - signStart);
 
+
+      const signTimeMs = Number(signEnd - signStart) / 1_000_000;
       const sigSize = signatureSizeInBytes(signature);
       const msgSize = Buffer.byteLength(payload, "utf8");
 
       const verifyStart = process.hrtime.bigint();
+
 
       let isValid;
       try {
@@ -147,7 +149,7 @@ module.exports = (io, socket) => {
       }
 
       const verifyEnd = process.hrtime.bigint();
-      const verifyTimeNs = Number(verifyEnd - verifyStart);
+      const verifyTimeMs = Number(verifyEnd - verifyStart) / 1_000_000;
 
       // Samla lokalt för denna körning
       samples.push({
@@ -159,8 +161,8 @@ module.exports = (io, socket) => {
       });
 
       // (Valfritt) Om du fortfarande vill fylla globala metrics:
-      metrics.signTimes.push(signTimeNs);
-      metrics.verifyTimes.push(verifyTimeNs);
+      metrics.signTimes.push(signTimeMs);
+      metrics.verifyTimes.push(verifyTimeMs);
       metrics.signatureSizes.push(sigSize);
     }
 
