@@ -1,27 +1,3 @@
-// src/security/getSigner.js
-
-/*
-  ==========================================
-  SIGNER FACTORY
-  ==========================================
-
-  Denna modul ansvarar för att välja vilken
-  digital signaturalgoritm som ska användas.
-
-  Valet styrs via miljövariabeln:
-
-      SIG_ALG
-
-  Exempel:
-      SIG_ALG=ed25519
-      SIG_ALG=slh-dsa
-
-  Syftet är att göra systemet algoritm-agnostiskt,
-  så att vi kan byta mellan klassisk och
-  post-quantum kryptografi utan att ändra
-  övrig applikationskod.
-*/
-
 
 // Importerar Ed25519-implementationen
 const ed25519 = require("./ed25519");
@@ -29,6 +5,7 @@ const ed25519 = require("./ed25519");
 // Importerar SLH-DSA-implementationen
 const slhDsa = require("./slh-dsa");
 
+// Importerar ML-DSA
 const mlDsa = require("./ml-dsa")
 
 function getSigner() {

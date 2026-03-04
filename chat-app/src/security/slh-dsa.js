@@ -1,11 +1,3 @@
-/*
-  ==========================================
-  SLH-DSA ADAPTER (Level 3: SHA2-192s-simple)
-  ==========================================
-
-  Adapter som kopplar vår signer-factory till liboqs
-  (WASM-implementation av SLH-DSA / SPHINCS+).
-*/
 
 // Cachear en enda WASM-instans (initiering är tung)
 let instancePromise = null;

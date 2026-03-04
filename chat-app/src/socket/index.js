@@ -32,11 +32,7 @@ async function maybeAwait(value) {
 }
 
 /*
-  Skapar eller hämtar nycklar för en användare.
-
-  Viktigt:
-  - Om generateKeypair() är async (SLH-DSA) lagrar vi Promise i map:en.
-  - Om den är sync (Ed25519) lagrar vi objektet direkt.
+  Skapar eller hämtar nycklar för en användare
 */
 function getOrCreateKeysForUser(userId) {
   const keyId = `${signer.name}:${userId}`;
@@ -49,9 +45,7 @@ function getOrCreateKeysForUser(userId) {
 }
 
 /*
-  Tolkar nyckelobjektet oavsett om det heter:
-  - { publicKey, secretKey } (vår nya standard)
-  - { publicKey, privateKey } (din gamla Ed25519-stil)
+  Tolkar nyckelobjektet oavsett om det heter
 */
 function normalizeKeys(keys) {
   const publicKey = keys.publicKey;
@@ -67,9 +61,7 @@ function normalizeKeys(keys) {
 }
 
 /*
-  Tolkar signatur oavsett format:
-  - Uint8Array/Buffer (SLH-DSA)
-  - base64-string (Ed25519 om du gör så idag)
+  Tolkar signatur oavsett format
 */
 function signatureSizeInBytes(signature) {
   if (typeof signature === "string") {
@@ -115,6 +107,9 @@ module.exports = (io, socket) => {
     const rawKeys = await maybeAwait(getOrCreateKeysForUser(sender));
     const { publicKey, secretKey } = normalizeKeys(rawKeys);
 
+    const payloadMessageBytes = Buffer.from(message, "base64");
+    const payloadSizeBytes = payloadMessageBytes.length;
+
     // NOLLSTÄLL PER KÖRNING (så /metrics visar senaste run)
     metrics.signTimes = [];
     metrics.verifyTimes = [];
@@ -140,7 +135,6 @@ module.exports = (io, socket) => {
 
       const sigSize = signatureSizeInBytes(signature);
       const msgSize = Buffer.byteLength(payload, "utf8");
-      const packageSizeBytes = msgSize + sigSize;
 
       const verifyStart = process.hrtime.bigint();
 
@@ -160,7 +154,7 @@ module.exports = (io, socket) => {
         i,
         signTimeNs,
         verifyTimeNs,
-        packageSizeBytes: packageSizeBytes,
+        payloadSizeBytes,
         valid: isValid,
       });
 
@@ -170,7 +164,7 @@ module.exports = (io, socket) => {
       metrics.signatureSizes.push(sigSize);
     }
 
-    const messageSizeBytes = Buffer.byteLength(payload, "utf8");
+    const messageSizeBytes = payloadSizeBytes;
 
     const savedPath = saveRunToJson({
       algorithm: signer.name,
