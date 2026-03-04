@@ -12,11 +12,12 @@ socket.on("connect", () => {
   const messageSize = 100;
 
   const messageBuffer = Buffer.alloc(messageSize,"a");
+
   socket.emit("send-message", {
     sender: "alice",
     receiver: "bob",
     message: messageBuffer.toString("base64"),
-    benchmark: { iterations: 10 }
+    benchmark: { iterations: 1 }
   });
 });
 

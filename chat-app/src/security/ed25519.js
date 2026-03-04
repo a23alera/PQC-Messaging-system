@@ -1,11 +1,3 @@
-/*
-  ==========================================
-  ED25519 ADAPTER
-  ==========================================
-
-  Adapter som kopplar signer-factory till Node.js inbyggda
-  Ed25519-implementation (OpenSSL via crypto-modulen).
-*/
 
 const crypto = require("crypto");
 
