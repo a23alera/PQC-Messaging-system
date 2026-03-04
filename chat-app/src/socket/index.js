@@ -154,8 +154,8 @@ module.exports = (io, socket) => {
       // Samla lokalt för denna körning
       samples.push({
         i,
-        signTimeNs,
-        verifyTimeNs,
+        signTimeMs,
+        verifyTimeMs,
         payloadSizeBytes,
         valid: isValid,
       });
