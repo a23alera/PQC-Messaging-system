@@ -126,6 +126,7 @@ module.exports = (io, socket) => {
 
     for (let i = 1; i <= iterations; i++) {
       const signStart = process.hrtime.bigint();
+      const signStartMs = Number(signStart / 1_000_000n);
 
       let signature;
       try {
@@ -136,13 +137,19 @@ module.exports = (io, socket) => {
       }
 
       const signEnd = process.hrtime.bigint();
-      const signTimeNs = Number(signEnd - signStart);
+      const signEndMs = Number(signEnd / 1_000_000n);
+
+
+      const signTimeMs = Number(signEndMs - signStartMs);
 
       const sigSize = signatureSizeInBytes(signature);
       const msgSize = Buffer.byteLength(payload, "utf8");
       const packageSizeBytes = msgSize + sigSize;
 
       const verifyStart = process.hrtime.bigint();
+      //convert nanoseconds to milliseconds
+      const verifyStartMs = Number(verifyStart / 1_000_000n);
+
 
       let isValid;
       try {
@@ -153,20 +160,23 @@ module.exports = (io, socket) => {
       }
 
       const verifyEnd = process.hrtime.bigint();
-      const verifyTimeNs = Number(verifyEnd - verifyStart);
+      //convert to milliseconds
+      const verifyEndMs = Number(verifyEnd / 1_000_000n);
+
+      const verifyTimeMs = Number(verifyEndMs - verifyStartMs);
 
       // Samla lokalt för denna körning
       samples.push({
         i,
-        signTimeNs,
-        verifyTimeNs,
+        signTimeMs,
+        verifyTimeMs,
         packageSizeBytes: packageSizeBytes,
         valid: isValid,
       });
 
       // (Valfritt) Om du fortfarande vill fylla globala metrics:
-      metrics.signTimes.push(signTimeNs);
-      metrics.verifyTimes.push(verifyTimeNs);
+      metrics.signTimes.push(signTimeMs);
+      metrics.verifyTimes.push(verifyTimeMs);
       metrics.signatureSizes.push(sigSize);
     }
 
