@@ -66,15 +66,15 @@ function main() {
   console.log("\n========== META ==========");
   console.log(meta);
 
-  console.log("\n========== SIGN (ns) ==========");
+  console.log("\n========== SIGN (Ms) ==========");
   console.log(JSON.stringify(summarize(samples, "signTimeMs")));
 
-  console.log("\n========== VERIFY (ns) ==========");
+  console.log("\n========== VERIFY (Ms) ==========");
   console.log(JSON.stringify(summarize(samples, "verifyTimeMs")));
 
-  console.log("\n========== PACKAGE SIZE (bytes) ==========");
+  console.log("\n========== Payload size (bytes) ==========");
   if (samples.length > 0) {
-    console.log(samples[0].packageSizeBytes);
+    console.log(samples[0].payloadSizeBytes);
   } else {
     console.log("No samples");
   }
