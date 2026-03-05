@@ -1,12 +1,8 @@
-// Importerar signer-factory som väljer algoritm (Ed25519 / SLH-DSA)
 const { getSigner } = require("../security/getSigner");
 const fs = require("fs");
 const path = require("path");
 
-/*
-  Metrics-objekt används för att lagra
-  benchmark-data som senare exponeras via /metrics.
-*/
+//Metrics are used to store the benchmark data
 const metrics = {
   signTimes: [],
   verifyTimes: [],
@@ -14,26 +10,15 @@ const metrics = {
   algorithm: null,
 };
 
-// Hämtar vald signaturalgoritm baserat på SIG_ALG
+//Fetches the chosen signature algorithm
 const signer = getSigner();
 metrics.algorithm = signer.name;
 
-/*
-  In-memory key store.
-  Sparar genererade nyckelpar per användare.
-*/
 const keyStore = new Map();
 
-/*
-  Hjälpfunktion: hantera både sync och async returnvärden.
-*/
 async function maybeAwait(value) {
   return value && typeof value.then === "function" ? await value : value;
 }
-
-/*
-  Skapar eller hämtar nycklar för en användare
-*/
 function getOrCreateKeysForUser(userId) {
   const keyId = `${signer.name}:${userId}`;
 
@@ -44,9 +29,6 @@ function getOrCreateKeysForUser(userId) {
   return keyStore.get(keyId);
 }
 
-/*
-  Tolkar nyckelobjektet oavsett om det heter
-*/
 function normalizeKeys(keys) {
   const publicKey = keys.publicKey;
   const secretKey = keys.secretKey || keys.privateKey;
@@ -60,9 +42,6 @@ function normalizeKeys(keys) {
   return { publicKey, secretKey };
 }
 
-/*
-  Tolkar signatur oavsett format
-*/
 function signatureSizeInBytes(signature) {
   if (typeof signature === "string") {
     return Buffer.from(signature, "base64").length;
@@ -110,7 +89,7 @@ module.exports = (io, socket) => {
     const payloadMessageBytes = Buffer.from(message, "base64");
     const payloadSizeBytes = payloadMessageBytes.length;
 
-    // NOLLSTÄLL PER KÖRNING (så /metrics visar senaste run)
+    //Reset metric values för next benchmark run
     metrics.signTimes = [];
     metrics.verifyTimes = [];
     metrics.signatureSizes = [];
@@ -151,7 +130,7 @@ module.exports = (io, socket) => {
       const verifyEnd = process.hrtime.bigint();
       const verifyTimeMs = Number(verifyEnd - verifyStart) / 1_000_000;
 
-      // Samla lokalt för denna körning
+      //Store locally for this run
       samples.push({
         i,
         signTimeMs,
@@ -160,7 +139,7 @@ module.exports = (io, socket) => {
         valid: isValid,
       });
 
-      // (Valfritt) Om du fortfarande vill fylla globala metrics:
+      //Store globally for this run
       metrics.signTimes.push(signTimeMs);
       metrics.verifyTimes.push(verifyTimeMs);
       metrics.signatureSizes.push(sigSize);

@@ -13,23 +13,19 @@ const { APP_NAME, NODE_ENV, PORT } = require('./src/helpers/env');
 const { failed } = require('./src/helpers/response');
 
 const listenSocket = require('./src/socket');
-const { metrics } = require('./src/socket/index'); // ← ENDA metrics-importen
+const { metrics } = require('./src/socket/index');
 
 const app = express();
 
-// endpoint för mätdata
 app.get('/metrics', (req, res) => {
   res.json(metrics);
 });
 
-// morgan
 app.use(morgan('dev'));
 
-// enable cors
 app.use(cors());
 app.options('*', cors());
 
-// security headers
 app.use(
   helmet({
     crossOriginEmbedderPolicy: false,
@@ -37,17 +33,13 @@ app.use(
   })
 );
 
-// sanitize
 app.use(xss());
 
-// compression
 app.use(compression());
 
-// body parsing
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// static + views
 app.set('views', `${__dirname}/src/views`);
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -67,7 +59,6 @@ app.get('/', (req, res) =>
   res.send(`${APP_NAME} API - ${NODE_ENV[0].toUpperCase() + NODE_ENV.slice(1)}`)
 );
 
-// routes
 app.use(require('./src/routes/auth.route'));
 app.use(require('./src/routes/user.route'));
 

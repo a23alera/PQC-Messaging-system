@@ -1,5 +1,62 @@
 {
+  "name": "PQC-Messaging-system",
+  "version": "1.0.0",
+  "description": "Run benchmarks on the algorithms ed25519, SLH-DSA and ML-DSA",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "start:ed25519": "SIG_ALG=ed25519 node server.js",
+    "start:slh": "SIG_ALG=slh-dsa node server.js",
+    "start:ml": "SIG_ALG=ml-dsa node server.js",
+    "dev:ed25519": "SIG_ALG=ed25519 nodemon server.js",
+    "dev:slh": "SIG_ALG=slh-dsa nodemon server.js",
+    "dev:ml": "SIG_ALG=ml-dsa nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a23alera/PQC-Messaging-system.git"
+  },
+  "keywords": [
+    "API",
+    "Node.js",
+    "Express.js",
+    "Socket.io",
+    "PostgreSQL"
+  ],
+  "author": "Ranhög, Alex and Herre, Axel",
+  "license": "MIT",
+  "homepage": "https://github.com/a23alera/PQC-Messaging-system#readme",
   "dependencies": {
-    "socket.io-client": "^4.8.3"
+    "@oqs/liboqs-js": "^0.15.1",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "ejs": "^3.1.8",
+    "express": "^4.22.1",
+    "express-validator": "^6.14.1",
+    "googleapis": "^104.0.0",
+    "helmet": "^5.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.7.5",
+    "pg": "^8.7.3",
+    "socket.io": "^4.5.1",
+    "socket.io-client": "^4.8.3",
+    "uuid": "^8.3.2",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.16.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "nodemon": "^2.0.16",
+    "prettier": "^2.6.2"
   }
 }
