@@ -1,6 +1,9 @@
 {
   "name": "PQC-Messaging-system",
   "version": "1.0.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "description": "Run benchmarks on the algorithms ed25519, SLH-DSA and ML-DSA",
   "main": "server.js",
   "scripts": {
