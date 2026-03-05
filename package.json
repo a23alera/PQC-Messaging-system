@@ -2,19 +2,19 @@
 "name": "pqc-messaging-system",
 "version": "1.0.0",
 "description": "Benchmarking Ed25519, ML-DSA and SLH-DSA signature algorithms in a messaging system",
-"main": "server.js",
+"main": "chat-app/server.js",
 "engines": {
 "node": ">=22.0.0"
 },
 "scripts": {
-"dev": "nodemon server.js",
-"start": "node server.js",
-"start:ed25519": "SIG_ALG=ed25519 node server.js",
-"start:slh": "SIG_ALG=slh-dsa node server.js",
-"start:ml": "SIG_ALG=ml-dsa node server.js",
-"dev:ed25519": "SIG_ALG=ed25519 nodemon server.js",
-"dev:slh": "SIG_ALG=slh-dsa nodemon server.js",
-"dev:ml": "SIG_ALG=ml-dsa nodemon server.js"
+"dev": "nodemon chat-app/server.js",
+"start": "node chat-app/server.js",
+"start:ed25519": "SIG_ALG=ed25519 node chat-app/server.js",
+"start:slh": "SIG_ALG=slh-dsa node chat-app/server.js",
+"start:ml": "SIG_ALG=ml-dsa node chat-app/server.js",
+"dev:ed25519": "SIG_ALG=ed25519 nodemon chat-app/server.js",
+"dev:slh": "SIG_ALG=slh-dsa nodemon chat-app/server.js",
+"dev:ml": "SIG_ALG=ml-dsa nodemon chat-app/server.js"
 },
 "repository": {
 "type": "git",
