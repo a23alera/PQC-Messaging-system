@@ -15,22 +15,22 @@ The program is a fork from the github repo [realtime-chat-api](https://github.co
 To run the program do the following steps:
 
 ### Install dependencies
-´´´bash
+```bash
 npm install package.json
-´´´
+```
 
 ### Start server
 To start the server run the following commands. <br>/your/path with the path to the project folder.<br>Replace algorithm with either ed25519, slh or ml.
-´´´bash
+```bash
 cd your/path/PQC-Messaging-system/chat-app/
 npm run start:algorithm
-´´´
+```
 ### Run benchmarks
 To run the benchmarks run the following commands. <br>/your/path with the path to the project folder.
-´´´bash
+```bash
 cd /your/path/PQC-Messaging-system/
 node sendmessage.js
-´´´
+```
 
 
 ## License
