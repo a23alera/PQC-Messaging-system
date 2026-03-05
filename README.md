@@ -16,13 +16,13 @@ To run the program do the following steps:
 
 ### Install dependencies
 ```bash
-npm install package.json
+npm install
 ```
 
 ### Start server
 To start the server run the following commands. <br>/your/path with the path to the project folder.<br>Replace algorithm with either ed25519, slh or ml.
 ```bash
-cd your/path/PQC-Messaging-system/chat-app/
+cd your/path/PQC-Messaging-system/
 npm run start:algorithm
 ```
 ### Run benchmarks
