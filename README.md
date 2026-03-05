@@ -26,6 +26,29 @@ cd your/path/PQC-Messaging-system/chat-app/
 npm run start:algorithm
 ```
 ### Run benchmarks
+Before running the benchmarks you may want to tweak the settings. This is done in:
+```
+/chat-app/src/testdata/analyze.js
+```
+The different parameters which can be set are message size(bytes) and number of iterations.
+
+```javascript
+socket.on("connect", () => {
+  console.log("Connected:", socket.id);
+
+  const messageSize = 1000; //<---- Change message size here
+
+  const messageBuffer = Buffer.alloc(messageSize,"a");
+
+  socket.emit("send-message", {
+    sender: "alice",
+    receiver: "bob",
+    message: messageBuffer.toString("base64"),
+    benchmark: { iterations: 100 }//<---- Change number of iterations here
+  });
+});
+```
+
 To run the benchmarks run the following commands. <br>/your/path with the path to the project folder.
 ```bash
 cd /your/path/PQC-Messaging-system/
