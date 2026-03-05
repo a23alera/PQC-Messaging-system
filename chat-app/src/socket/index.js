@@ -2,6 +2,10 @@ const { getSigner } = require("../security/getSigner");
 const fs = require("fs");
 const path = require("path");
 
+function yieldToEventLoop() {
+  return new Promise((resolve) => setImmediate(resolve));
+}
+
 //Metrics are used to store the benchmark data
 const metrics = {
   signTimes: [],
@@ -143,6 +147,11 @@ module.exports = (io, socket) => {
       metrics.signTimes.push(signTimeMs);
       metrics.verifyTimes.push(verifyTimeMs);
       metrics.signatureSizes.push(sigSize);
+
+      if (i % 5 === 0) {
+        await yieldToEventLoop();
+      }
+
     }
 
     const messageSizeBytes = payloadSizeBytes;
