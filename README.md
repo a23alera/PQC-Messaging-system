@@ -11,7 +11,73 @@ The program is a fork from the github repo [realtime-chat-api](https://github.co
 <br>
 <br>
 
+## How to use
+To run the program do the following steps:
 
+### Install dependencies
+```bash
+npm install
+```
+
+### Start server
+To start the server run the following commands. <br>/your/path with the path to the project folder.<br>Replace algorithm with either ed25519, slh or ml.
+```bash
+cd your/path/PQC-Messaging-system/
+npm run start:algorithm
+```
+### Run benchmarks
+Before running the benchmarks you may want to tweak the settings. This is done in:
+```
+/chat-app/src/testdata/analyze.js
+```
+The different parameters which can be set are message size(bytes) and number of iterations.
+
+```javascript
+socket.on("connect", () => {
+  console.log("Connected:", socket.id);
+
+  const messageSize = 1000; //<---- Change message size here
+
+  const messageBuffer = Buffer.alloc(messageSize,"a");
+
+  socket.emit("send-message", {
+    sender: "alice",
+    receiver: "bob",
+    message: messageBuffer.toString("base64"),
+    benchmark: { iterations: 100 }//<---- Change number of iterations here
+  });
+});
+```
+
+To run the benchmarks run the following commands. <br>/your/path with the path to the project folder.
+```bash
+cd /your/path/PQC-Messaging-system/
+node sendMessage.js
+```
+### View results
+To view the results run the following commands:
+```bash
+cd /your/path/PQC-Messaging-system/
+node testdata/analyze.js results/filename
+```
+<b>Replace</b> the filename depending on what algorithm has been benchmarked.<br>
+
+- For ed25519, the correct filename is:
+
+```
+Ed25519_latest.json
+```
+- For ML-DSA, the correct filename is:
+
+```
+ml-dsa65_latest.json
+```
+
+- For SLH-DSA, the correct filename is:
+
+```
+SLH-DSA-SHA2-192s_latest.json
+```
 
 ## License
 MIT License
