@@ -29,9 +29,32 @@ npm run start:algorithm
 To run the benchmarks run the following commands. <br>/your/path with the path to the project folder.
 ```bash
 cd /your/path/PQC-Messaging-system/
-node sendmessage.js
+node sendMessage.js
+```
+### View results
+To view the results run the following commands:
+```bash
+cd /your/path/PQC-Messaging-system/
+node testdata/analyze.js results/filename
+```
+<b>Replace</b> the filename depending on what algorithm has been benchmarked.<br>
+
+- For ed25519, the correct filename is:
+
+```
+Ed25519_latest.json
+```
+- For ML-DSA, the correct filename is:
+
+```
+ml-dsa65_latest.json
 ```
 
+- For SLH-DSA, the correct filename is:
+
+```
+SLH-DSA-SHA2-192s_latest.json
+```
 
 ## License
 MIT License
