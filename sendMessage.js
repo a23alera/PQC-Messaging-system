@@ -9,7 +9,7 @@ console.log("Client script started");
 socket.on("connect", () => {
   console.log("Connected:", socket.id);
 
-  const messageSize = 1000;
+  const messageSize = 10000;
 
   const messageBuffer = Buffer.alloc(messageSize,"a");
 
@@ -17,7 +17,7 @@ socket.on("connect", () => {
     sender: "alice",
     receiver: "bob",
     message: messageBuffer.toString("base64"),
-    benchmark: { iterations: 100 }
+    benchmark: { iterations: 10000 }
   });
 });
 
