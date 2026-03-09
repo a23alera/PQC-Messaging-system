@@ -28,7 +28,7 @@ npm run start:algorithm
 ### Run benchmarks
 Before running the benchmarks you may want to tweak the settings. This is done in:
 ```
-/chat-app/src/testdata/analyze.js
+PQC-Messaging-system/sendMessage.js
 ```
 The different parameters which can be set are message size(bytes) and number of iterations.
 
@@ -57,7 +57,7 @@ node sendMessage.js
 ### View results
 To view the results run the following commands:
 ```bash
-cd /your/path/PQC-Messaging-system/
+cd /your/path/PQC-Messaging-system/chat-app/src
 node testdata/analyze.js results/filename
 ```
 <b>Replace</b> the filename depending on what algorithm has been benchmarked.<br>
