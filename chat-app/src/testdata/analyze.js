@@ -16,6 +16,15 @@ function median(arr) {
   return (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
+function percentile(arr, p) {
+  if (arr.length === 0) return null;
+
+  const sorted = [...arr].sort((a, b) => a - b);
+  const index = Math.floor(p * (sorted.length - 1));
+
+  return sorted[index];
+}
+
 function min(arr) {
   if (arr.length === 0) return null;
   return Math.min(...arr);
@@ -36,6 +45,8 @@ function summarize(samples, key) {
     mean: mean(values),
     median: median(values),
     min: min(values),
+    q1: percentile(values, 0.25),
+    q3: percentile(values, 0.75),
     max: max(values),
   };
 }
