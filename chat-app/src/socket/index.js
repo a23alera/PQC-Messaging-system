@@ -1,6 +1,9 @@
 const { getSigner } = require("../security/getSigner");
 const fs = require("fs");
 const path = require("path");
+const { stringify } = require('csv-stringify');
+
+
 
 function yieldToEventLoop() {
   return new Promise((resolve) => setImmediate(resolve));
@@ -62,23 +65,40 @@ function safeFilename(s) {
 }
 
 function saveRunToJson({ algorithm, iterations, messageSizeBytes, samples }) {
-  const resultsDir = path.join(__dirname, "..", "results");
-  ensureDir(resultsDir);
+  return new Promise((resolve, reject) => {
+    const resultsDir = path.join(__dirname, "..", "results");
+    ensureDir(resultsDir);
 
-  const filePath = path.join(resultsDir, `${safeFilename(algorithm)}_latest.json`);
+    const filePathJson = path.join(resultsDir, `${safeFilename(algorithm)}_latest.json`);
+    const filePathCsv = path.join(resultsDir, `${safeFilename(algorithm)}_${safeFilename(messageSizeBytes)}_latest.csv`);
 
-  const payload = {
-    meta: {
-      algorithm,
-      iterations,
-      messageSizeBytes,
-      startedAt: new Date().toISOString(),
-    },
-    samples,
-  };
+    const payload = {
+      meta: {
+        algorithm,
+        iterations,
+        messageSizeBytes,
+        startedAt: new Date().toISOString(),
+      },
+      samples,
+    };
 
-  fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), "utf8");
-  return filePath;
+    fs.writeFileSync(filePathJson, JSON.stringify(payload, null, 2), "utf8");
+
+    const csvData = samples.map(sample => ({
+      iteration: sample.i,
+      signTimeMs: sample.signTimeMs,
+      verifyTimeMs: sample.verifyTimeMs,
+      payloadSizeBytes: sample.payloadSizeBytes,
+      valid: sample.valid,
+      algorithm: algorithm,
+    }));
+
+    stringify(csvData, { header: true }, (err, csv) => {
+      if (err) return reject(err);
+      fs.writeFileSync(filePathCsv, csv, "utf8");
+      resolve({ filePathJson, filePathCsv });
+    });
+  });
 }
 
 module.exports = (io, socket) => {
@@ -156,22 +176,26 @@ module.exports = (io, socket) => {
 
     const messageSizeBytes = payloadSizeBytes;
 
-    const savedPath = saveRunToJson({
-      algorithm: signer.name,
-      iterations,
-      messageSizeBytes,
-      samples,
-    });
+  try {
+      const { filePathJson, filePathCsv } = await saveRunToJson({
+        algorithm: signer.name,
+        iterations,
+        messageSizeBytes,
+        samples,
+      });
 
-    socket.emit("benchmark-result", {
-      algorithm: signer.name,
-      iterations,
-      savedPath,
-      samples,
-      last: samples[samples.length - 1],
-    });
-
+      socket.emit("benchmark-result", {
+        algorithm: signer.name,
+        iterations,
+        savedPathJson: filePathJson,
+        savedPathCsv: filePathCsv,
+        samples,
+        last: samples[samples.length - 1],
+      });
+    } catch (err) {
+      console.error("Error saving benchmark results:", err);
+      socket.emit("benchmark-error", { error: "Failed to save benchmark results." });
+    }
   });
-};
-
+}
 module.exports.metrics = metrics;
