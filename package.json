@@ -33,6 +33,7 @@
     "license": "MIT",
     "homepage": "https://github.com/a23alera/PQC-Messaging-system#readme",
     "dependencies": {
+        "@alexvcasillas/memory-monitor": "^1.0.0",
         "@oqs/liboqs-js": "0.15.1",
         "bcrypt": "^5.1.1",
         "compression": "^1.7.4",
