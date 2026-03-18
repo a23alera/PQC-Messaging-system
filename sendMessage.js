@@ -9,7 +9,7 @@ console.log("Client script started");
 socket.on("connect", () => {
   console.log("Connected:", socket.id);
 
-  const messageSize = 10000;
+  const messageSize = 1000;
 
   const messageBuffer = Buffer.alloc(messageSize,"a");
 
