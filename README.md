@@ -86,6 +86,7 @@ Each benchmark is also saved as a CSV file. These files are located together wit
 MIT License
 
 Copyright (c) 2022 Nur Muhammad Alif Putra Setiawan
+<br>
 Copyright (c) 2026 Alex Ranhög, Axel Herre
 
 
