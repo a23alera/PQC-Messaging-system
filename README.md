@@ -4,12 +4,13 @@
 This program is a part of a bachelors thesis created by Axel Herre and Alex Ranhög from the University of Skövde.
 <br>
 <br>
-The aim of this program is to serve as a tool in the experiment which is conducted during our research. The tool is to be used to create benchmarks for the encryption algorithm ed25519 along with the quantum-resistant encryption algorithms SLH-DSA and ML_DSA. The tool will benchmark signing-speed, verifying-speed and size of the signature.
+The aim of this program is to serve as a tool in the experiment which is conducted during our research. The tool is to be used to create benchmarks for the encryption algorithm ed25519 along with the quantum-resistant encryption algorithms SLH-DSA and ML-DSA. The tool will benchmark signing-speed, verifying-speed and memory usage.
 
 ## About
 The program is a fork from the github repo [realtime-chat-api](https://github.com/altrawan/realtime-chat-api) by user altrawan. The changes which has been made from the original repo is the removal of database implementation since all benchmarks are done locally. Ofcourse several encryption modules has also been added.
 <br>
 <br>
+To measure memory usage, the module from github repo [memory-monitor](https://github.com/alexvcasillas/memory-monitor) was implemented in the system.
 
 ## How to use
 To run the program do the following steps:
@@ -78,6 +79,8 @@ ml-dsa65_latest.json
 ```
 SLH-DSA-SHA2-192s_latest.json
 ```
+
+Each benchmark is also saved as a CSV file. These files are located together with the json files in the results folder.
 
 ## License
 MIT License
